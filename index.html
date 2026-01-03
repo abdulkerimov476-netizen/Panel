@@ -1,8 +1,89 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG Key Panel</title>
+    <style>
+        /* Görseldeki Siyah/Turuncu Tema */
+        body { background-color: #050505; color: #ff9800; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .panel-container { 
+            width: 100%; max-width: 380px; margin: auto; padding: 20px; 
+            border: 1px solid #ff9800; border-radius: 20px; background: #111;
+            box-sizing: border-box; box-shadow: 0 0 15px rgba(255, 152, 0, 0.2);
+        }
+        .title { text-align: center; font-size: 22px; letter-spacing: 2px; margin-bottom: 20px; color: #ff9800; text-transform: uppercase; }
+        label { display: block; margin-top: 15px; font-size: 12px; color: #888; }
+        select, input { 
+            width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box;
+            background: #1c1c1c; border: 1px solid #333; color: #fff; border-radius: 10px; font-size: 14px;
+        }
+        .total-section { 
+            background: #ff9800; color: #000; padding: 15px; 
+            margin-top: 20px; text-align: center; font-weight: bold; border-radius: 12px; font-size: 18px;
+        }
+        .btn-generate { 
+            width: 100%; padding: 15px; margin-top: 15px; 
+            background: #ff9800; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: #000;
+        }
+        .key-list-area { margin-top: 20px; border-top: 1px solid #222; padding-top: 10px; }
+        .key-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            background: #181818; padding: 12px; margin-bottom: 8px; 
+            border-radius: 10px; border-left: 4px solid #ff9800;
+        }
+        .key-info { display: flex; flex-direction: column; }
+        .key-text { color: #fff; font-size: 14px; font-weight: bold; }
+        .key-sub { color: #888; font-size: 11px; margin-top: 3px; }
+        .usage-count { color: #00ff00; font-weight: bold; }
+        .deactivate-btn { 
+            background: #d32f2f; color: white; border: none; 
+            padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+        }
+        .btn-nav { background: none; border: none; color: #666; width: 100%; margin-top: 20px; cursor: pointer; text-decoration: underline; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="panel-container" id="user-page">
+    <h2 class="title">KEY GEN</h2>
+    
+    <label>Games</label>
+    <select id="game-select">
+        <option value="PUBG MOBILE">PUBG MOBILE</option>
+        <option value="PUBG MOBILE LITE">PUBG MOBILE LITE</option>
+    </select>
+
+    <label>Duration Of Key</label>
+    <select id="duration-select" onchange="updatePrice()">
+        <option value="2 Hour" data-price="0">2 Hour - Free</option>
+        <option value="5 Hour" data-price="0">5 Hour - Free</option>
+        <option value="1 Day" data-price="3">1 Day - $3</option>
+        <option value="1 Week" data-price="12">1 Week - $12</option>
+        <option value="1 Month" data-price="25">1 Month - $25</option>
+    </select>
+
+    <label>Max Devices (Cihaz Sınırı)</label>
+    <input type="number" id="max-devices" value="1" min="1">
+
+    <label>Enter Bulk Key Number (Adet)</label>
+    <input type="number" id="bulk-number" value="1" min="1">
+
+    <div class="total-section">TOTAL PRICE: $<span id="total-price">0</span></div>
+
+    <button class="btn-generate" onclick="generateUserKey()">GENERATE KEY</button>
+    
+    <div class="key-list-area" id="user-key-list">
+        </div>
+    
+    <button class="btn-nav" onclick="switchPage('admin-page')">Admin/Özel Panele Geç →</button>
+</div>
+
 <div class="panel-container" id="admin-page" style="display:none; border-color: #4CAF50;">
-    <h2 class="title" style="color: #4CAF50;">ADMIN CONTROL PANEL</h2>
+    <h2 class="title" style="color: #4CAF50;">ADMIN CONTROL</h2>
 
     <label>Özel Key İsmi Yaz</label>
-    <input type="text" id="custom-key-name" placeholder="Örn: VIP-PLAYER-01">
+    <input type="text" id="custom-key-name" placeholder="Örn: VIP-KEY-100">
 
     <label>Süre Seçeneği</label>
     <select id="custom-duration-select">
@@ -18,104 +99,58 @@
     <label>Cihaz Sınırı (Limit)</label>
     <input type="number" id="admin-device-limit" value="100">
 
-    <button class="btn-generate" style="background: #4CAF50; color: white;" onclick="createAdminKey()">ÖZEL KEY OLUŞTUR</button>
+    <button class="btn-generate" style="background: #4CAF50; color: #fff;" onclick="createAdminKey()">ÖZEL KEY OLUŞTUR</button>
 
     <div class="key-list-area" id="admin-key-list">
-        <h3 style="font-size: 14px; border-bottom: 1px solid #333; margin-bottom: 10px;">Aktif Keyler ve Cihaz Durumu</h3>
         </div>
 
     <button class="btn-nav" onclick="switchPage('user-page')">← Satın Alma Sayfasına Dön</button>
 </div>
 
 <script>
-    // Fiyatı sadece süreye göre belirle (Cihaz sayısıyla çarpılmaz)
     function updatePrice() {
         const durationSelect = document.getElementById('duration-select');
         const price = durationSelect.options[durationSelect.selectedIndex].getAttribute('data-price');
         document.getElementById('total-price').innerText = price;
     }
 
-    // Sayfalar arası geçiş
     function switchPage(pageId) {
         document.getElementById('user-page').style.display = pageId === 'user-page' ? 'block' : 'none';
         document.getElementById('admin-page').style.display = pageId === 'admin-page' ? 'block' : 'none';
     }
 
-    // Ortak Key Oluşturma Fonksiyonu (Deaktif Et ve Cihaz Sayacı İçerir)
+    // Key Ekleme Fonksiyonu (Deaktif etme ve 0/X cihaz sayacı dahil)
     function addKeyToList(name, duration, limit, listId) {
-        // Cihaz kullanımını simüle etmek için rastgele bir sayı (Örn: 0)
-        const currentUsage = 0; 
-        
         const keyDiv = document.createElement('div');
         keyDiv.className = 'key-item';
         keyDiv.innerHTML = `
             <div class="key-info">
-                <span class="key-text"><strong>${name}</strong></span>
-                <span class="key-sub">${duration} | <span class="usage-count">${currentUsage}/${limit} Cihaz</span></span>
+                <span class="key-text">${name}</span>
+                <span class="key-sub">${duration} | <span class="usage-count">0/${limit} Cihaz</span></span>
             </div>
             <button class="deactivate-btn" onclick="this.parentElement.remove()">Deaktif Et</button>
         `;
-        document.getElementById(listId).appendChild(keyDiv);
+        document.getElementById(listId).prepend(keyDiv);
     }
 
-    // Kullanıcı Sayfası Key Üretimi
     function generateUserKey() {
         const duration = document.getElementById('duration-select').value;
         const limit = document.getElementById('max-devices').value;
         const bulk = document.getElementById('bulk-number').value;
-
         for (let i = 0; i < bulk; i++) {
             const randomID = Math.random().toString(36).substring(2, 8).toUpperCase();
             addKeyToList("PUBG-" + randomID, duration, limit, 'user-key-list');
         }
     }
 
-    // Admin Sayfası Key Üretimi (Yeni süre listesiyle)
     function createAdminKey() {
         const name = document.getElementById('custom-key-name').value;
         const duration = document.getElementById('custom-duration-select').value;
         const limit = document.getElementById('admin-device-limit').value;
-
-        if(!name) return alert("Lütfen anahtar ismi girin!");
-        
+        if(!name) return alert("Lütfen isim girin!");
         addKeyToList(name, duration, limit, 'admin-key-list');
     }
 </script>
 
-<style>
-    /* Görseldeki temaya uygun CSS (Siyah & Turuncu & Yeşil) */
-    body { background-color: #050505; color: #ff9800; font-family: sans-serif; }
-    .panel-container { 
-        width: 350px; margin: 15px auto; padding: 20px; 
-        border: 1px solid #ff9800; border-radius: 15px; background: #111;
-    }
-    .title { text-align: center; font-size: 18px; margin-bottom: 15px; }
-    label { display: block; margin-top: 10px; font-size: 12px; color: #777; }
-    select, input { 
-        width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box;
-        background: #1c1c1c; border: 1px solid #333; color: #fff; border-radius: 8px;
-    }
-    .total-section { 
-        background: #ff9800; color: #000; padding: 10px; 
-        margin-top: 15px; text-align: center; font-weight: bold; border-radius: 8px;
-    }
-    .btn-generate { 
-        width: 100%; padding: 12px; margin-top: 10px; 
-        background: #ff9800; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
-    }
-    .key-list-area { margin-top: 15px; }
-    .key-item { 
-        display: flex; justify-content: space-between; align-items: center;
-        background: #181818; padding: 8px; margin-bottom: 6px; 
-        border-radius: 6px; border-left: 3px solid #ff9800;
-    }
-    .key-info { display: flex; flex-direction: column; }
-    .key-text { color: #fff; font-size: 13px; }
-    .key-sub { color: #888; font-size: 10px; }
-    .usage-count { color: #00ff00; font-weight: bold; }
-    .deactivate-btn { 
-        background: #c62828; color: white; border: none; 
-        padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;
-    }
-    .btn-nav { background: none; border: none; color: #444; width: 100%; margin-top: 10px; cursor: pointer; text-decoration: underline; font-size: 11px; }
-</style>
+</body>
+</html>
