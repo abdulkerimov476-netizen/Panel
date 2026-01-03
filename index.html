@@ -3,70 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AdminTT97 - Panel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <title>PUBG Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; color: #ffd700; font-family: 'Orbitron', sans-serif; background-color: #000; overflow: hidden; height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; }
-        .background-image-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://w0.peakpx.com/wallpaper/77/439/wallpaper-desktop-pubg.jpg'); background-size: cover; background-position: center; opacity: 0.3; z-index: -1; filter: brightness(0.5); }
-        .page-content { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.4s ease-out; }
-        .page-content.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .form-frame { background: rgba(0, 0, 0, 0.9); padding: 35px; border-radius: 20px; border: 2px solid #ffaa00; box-shadow: 0 0 30px rgba(255, 170, 0, 0.3); width: 100%; max-width: 360px; }
-        .pubg-logo-text { font-size: 3.5em; font-weight: 900; color: #fff; text-shadow: 0 0 20px #ffaa00; border: 3px solid #fff; padding: 5px 25px; margin-bottom: 40px; background: rgba(0,0,0,0.4); }
-        .login-input { width: 100%; padding: 15px; margin-bottom: 15px; background: rgba(30, 30, 30, 0.9); border: 1px solid #ffaa00; color: #fff; border-radius: 10px; font-family: 'Orbitron'; outline: none; text-align: center; }
-        .action-button { width: 100%; padding: 16px; margin-top: 5px; background: linear-gradient(45deg, #ffaa00, #ff8800); color: #000; border: none; border-radius: 10px; font-family: 'Orbitron'; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 136, 0, 0.4); }
-        .duration-item { display: flex; justify-content: space-between; padding: 14px; margin-bottom: 10px; background: rgba(60, 60, 60, 0.4); border-radius: 8px; border: 1px solid #555; cursor: pointer; }
-        .duration-item.selected { border-color: #ffaa00; background: rgba(255, 170, 0, 0.15); box-shadow: 0 0 15px rgba(255, 170, 0, 0.3); }
-        .total-price-box { background: #ffaa00; color: #000; padding: 15px; border-radius: 10px; margin: 20px 0; font-weight: 700; text-align: center; }
-        #key-output { margin-top: 20px; padding: 15px; background: #222; border-radius: 8px; color: #00ff00; font-weight: bold; border: 1px dashed #ffaa00; width: 100%; text-align: center; }
+        body { margin: 0; font-family: 'Roboto', sans-serif; background-color: #f4f4f4; color: #333; }
+        .header { background-color: #c62828; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; }
+        .container { padding: 20px; max-width: 500px; margin: auto; }
+        
+        .section-title { font-size: 16px; margin-bottom: 8px; color: #555; font-weight: bold; }
+        select, input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; background: white; box-sizing: border-box; }
+        
+        .price-box { background: #fbc02d; padding: 15px; border-radius: 5px; display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; }
+        .price-label { flex-grow: 1; }
+        
+        .gen-button { width: 100%; background-color: white; border: 2px solid #1976d2; color: #1976d2; padding: 12px; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; }
+        
+        #key-output { margin-top: 20px; padding: 15px; background: #e8f5e9; border: 1px dashed #2e7d32; border-radius: 5px; text-align: center; font-weight: bold; color: #2e7d32; display: none; word-break: break-all; }
+        
+        /* Giriş Ekranı */
+        #login-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #c62828; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .login-btn { width: 100%; background: #c62828; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="background-image-overlay"></div>
-    <div id="page-1" class="page-content active">
-        <h1 class="pubg-logo-text">PUBG</h1>
-        <div class="form-frame">
-            <input type="text" id="username" class="login-input" placeholder="LOGIN">
-            <input type="password" id="password" class="login-input" placeholder="PASSWORD">
-            <div id="login-message" style="color: #ff4747; margin-bottom: 10px; font-size: 0.8em; min-height: 20px; text-align: center;"></div>
-            <button onclick="attemptLogin()" class="action-button">ENTER</button>
-        </div>
+
+<div id="login-page">
+    <div class="login-box">
+        <h2 style="color:#c62828">ADMIN LOGIN</h2>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="login-btn" onclick="login()">LOGIN</button>
+        <p id="err" style="color:red; font-size:12px; margin-top:10px;"></p>
     </div>
-    <div id="page-2" class="page-content">
-        <div class="form-frame">
-            <h2 style="margin-top:0; text-align:center; color:#fff;">KEY GEN</h2>
-            <div id="duration-list">
-                <div class="duration-item selected" data-price="1" onclick="selectItem(this)"><span>TEST</span><span>$1</span></div>
-                <div class="duration-item" data-price="3" onclick="selectItem(this)"><span>1 DAY</span><span>$3</span></div>
-                <div class="duration-item" data-price="12" onclick="selectItem(this)"><span>1 WEEK</span><span>$12</span></div>
-                <div class="duration-item" data-price="30" onclick="selectItem(this)"><span>1 MONTH</span><span>$30</span></div>
-            </div>
-            <div class="total-price-box">TOTAL: $<span id="total-price">1</span></div>
-            <button onclick="generateKey()" class="action-button">GENERATE KEY</button>
-            <div id="key-output">WAITING...</div>
-        </div>
+</div>
+
+<div class="header">CREATE LICENSE</div>
+<div class="container">
+    <div class="section-title">Games</div>
+    <select>
+        <option>PUBG Mobile</option>
+        <option>BGMI</option>
+    </select>
+
+    <div class="section-title">Duration Of Key</div>
+    <select id="duration" onchange="updatePrice()">
+        <option value="80">5 Hour — ₹80/Device</option>
+        <option value="150">24 Hour — ₹150/Device</option>
+        <option value="500">1 Week — ₹500/Device</option>
+        <option value="1200">1 Month — ₹1200/Device</option>
+    </select>
+
+    <div class="section-title">Max Devices</div>
+    <input type="number" value="1" readonly>
+
+    <div class="section-title">ENTER BULK KEY NUMBER</div>
+    <input type="number" value="1" readonly>
+
+    <div class="section-title">TOTAL PRICES</div>
+    <div class="price-box">
+        <span class="price-label">₹</span>
+        <span id="total-price">80</span>
     </div>
-    <script>
-        let currentPrice = 1;
-        function attemptLogin() {
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
-            if(u === "Admin97" && p === "Admin1997") {
-                document.getElementById('page-1').classList.remove('active');
-                document.getElementById('page-2').classList.add('active');
-            } else { document.getElementById('login-message').innerText = "WRONG LOGIN OR PASSWORD!"; }
+
+    <button class="gen-button" onclick="generate()">GENERATE KEY</button>
+    <div id="key-output"></div>
+</div>
+
+<script>
+    function login() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+        if(u === "Admin97" && p === "Admin1997") {
+            document.getElementById('login-page').style.display = 'none';
+        } else {
+            document.getElementById('err').innerText = "WRONG LOGIN OR PASSWORD!";
         }
-        function selectItem(el) {
-            document.querySelectorAll('.duration-item').forEach(i => i.classList.remove('selected'));
-            el.classList.add('selected');
-            currentPrice = el.getAttribute('data-price');
-            document.getElementById('total-price').innerText = currentPrice;
-        }
-        function generateKey() {
-            const key = "ADM97-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-            document.getElementById('key-output').innerText = key;
-        }
-    </script>
+    }
+
+    function updatePrice() {
+        const p = document.getElementById('duration').value;
+        document.getElementById('total-price').innerText = p;
+    }
+
+    function generate() {
+        const key = "ADM97-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+        const out = document.getElementById('key-output');
+        out.innerText = "YOUR KEY: " + key;
+        out.style.display = 'block';
+    }
+</script>
 </body>
 </html>
