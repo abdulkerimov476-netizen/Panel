@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PG Premium Panel</title>
     <style>
-        /* Görseldeki Siyah & Turuncu Tema */
         body { background-color: #050505; color: #ff9800; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; }
         .panel-container { 
             width: 100%; max-width: 420px; margin: 20px auto; padding: 20px; 
             border: 1px solid #ff9800; border-radius: 20px; background: #0f0f0f;
             box-sizing: border-box; box-shadow: 0 0 25px rgba(255, 152, 0, 0.2);
         }
-        .title { text-align: center; font-size: 22px; letter-spacing: 3px; margin-bottom: 20px; text-shadow: 0 0 10px #ff9800; }
+        .title { text-align: center; font-size: 22px; letter-spacing: 3px; margin-bottom: 20px; text-shadow: 0 0 10px #ff9800; text-transform: uppercase; }
         label { display: block; margin-top: 15px; font-size: 11px; color: #888; text-transform: uppercase; }
         select, input { 
             width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box;
@@ -39,7 +38,7 @@
             word-break: break-all; margin-bottom: 10px; line-height: 1.5; padding-right: 75px;
         }
         .key-sub { font-size: 11px; color: #888; }
-        .usage-count { color: #00ff00; font-weight: bold; } /* Cihaz Sayacı */
+        .usage-count { color: #00ff00; font-weight: bold; } /* */
         .deactivate-btn { 
             position: absolute; right: 10px; top: 10px;
             background: #d32f2f; color: white; border: none; 
@@ -83,19 +82,20 @@
 </div>
 
 <div class="panel-container" id="admin-page" style="display:none; border-color: #4CAF50;">
-    <h2 class="title" style="color: #4CAF50;">ADMIN PANEL</h2>
+    <h2 class="title" style="color: #4CAF50;">ADMIN CONTROL</h2>
     <label>Özel Key İsmi Yaz</label>
-    <input type="text" id="custom-key-name" placeholder="Kendi ismini yaz">
-    <label>Süre ve Cihaz</label>
+    <input type="text" id="custom-key-name" placeholder="Örn: ADMIN-KEY-99">
+    <label>Süre Seçeneği</label>
     <select id="custom-duration-select">
         <option value="2 Saat">2 Saat</option>
         <option value="1 Gün">1 Gün</option>
         <option value="1 Hafta">1 Hafta</option>
     </select>
-    <input type="number" id="admin-device-limit" value="100" style="margin-top:10px;">
+    <label>Cihaz Sınırı</label>
+    <input type="number" id="admin-device-limit" value="100">
     <button class="btn-generate" style="background: #4CAF50; color: white;" onclick="createAdminKey()">ÖZEL KEY OLUŞTUR</button>
     <div class="key-list-area" id="admin-key-list"></div>
-    <button class="btn-nav" onclick="switchPage('user-page')">← Geri Dön</button>
+    <button class="btn-nav" onclick="switchPage('user-page')">← Satın Alma Sayfasına Dön</button>
 </div>
 
 <script>
@@ -109,28 +109,28 @@
         document.getElementById('admin-page').style.display = p === 'admin-page' ? 'block' : 'none';
     }
 
-    // Rastgele Uzun Kod Üretici (Tam numuneye göre)
-    function generateLongCode(length) {
+    // Rastgele Karakter Üretme (Numune uzunluğu için)
+    function randomString(len) {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let res = '';
-        for (let i = 0; i < length; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+        for (let i = 0; i < len; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
         return res;
     }
 
-    function generatePass(length) {
+    function randomPass(len) {
         const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let res = '';
-        for (let i = 0; i < length; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+        for (let i = 0; i < len; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
         return res;
     }
 
-    function addKey(keyFull, durationLabel, limit, listId) {
+    function addKeyToList(keyFull, durationLabel, limit, listId) {
         const div = document.createElement('div');
         div.className = 'key-item';
         div.innerHTML = `
             <div class="key-top">
                 <span class="key-text">${keyFull}</span>
-                <button class="deactivate-btn" onclick="this.parentElement.remove()">Deaktif Et</button>
+                <button class="deactivate-btn" onclick="this.parentElement.parentElement.remove()">Deaktif Et</button>
             </div>
             <div class="key-sub">${durationLabel} | <span class="usage-count">0/${limit} Cihaz</span></div>
         `;
@@ -144,11 +144,11 @@
         const bulk = document.getElementById('bulk-number').value;
 
         for (let i = 0; i < bulk; i++) {
-            // Örnekteki gibi çok uzun bir orta kısım (24 karakter) ve 8 karakterlik şifre
-            const longMid = generateLongCode(24);
-            const pass = generatePass(8);
-            const finalKey = `PG-${dur}-${longMid}:${pass}`;
-            addKey(finalKey, durText, limit, 'user-key-list');
+            // Örnek: PG-1D-GR1RBITOP5TLZIABGU03:OnxN39zM
+            const midCode = randomString(20); // Orta kısım uzunluğu
+            const passCode = randomPass(8);   // Şifre kısmı uzunluğu
+            const finalKey = `PG-${dur}-${midCode}:${passCode}`;
+            addKeyToList(finalKey, durText, limit, 'user-key-list');
         }
     }
 
@@ -157,7 +157,7 @@
         const dur = document.getElementById('custom-duration-select').value;
         const limit = document.getElementById('admin-device-limit').value;
         if(!name) return alert("İsim yaz!");
-        addKey(name, dur, limit, 'admin-key-list');
+        addKeyToList(name, dur, limit, 'admin-key-list');
     }
 </script>
 </body>
