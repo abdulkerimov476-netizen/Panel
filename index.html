@@ -1,97 +1,128 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUBG Admin Panel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { margin: 0; font-family: 'Roboto', sans-serif; background-color: #f4f4f4; color: #333; }
-        .header { background-color: #c62828; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; }
-        .container { padding: 20px; max-width: 500px; margin: auto; }
-        
-        .section-title { font-size: 16px; margin-bottom: 8px; color: #555; font-weight: bold; }
-        select, input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; background: white; box-sizing: border-box; }
-        
-        .price-box { background: #fbc02d; padding: 15px; border-radius: 5px; display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; }
-        .price-label { flex-grow: 1; }
-        
-        .gen-button { width: 100%; background-color: white; border: 2px solid #1976d2; color: #1976d2; padding: 12px; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; }
-        
-        #key-output { margin-top: 20px; padding: 15px; background: #e8f5e9; border: 1px dashed #2e7d32; border-radius: 5px; text-align: center; font-weight: bold; color: #2e7d32; display: none; word-break: break-all; }
-        
-        /* Giriş Ekranı */
-        #login-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #c62828; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-        .login-box { background: white; padding: 30px; border-radius: 10px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .login-btn { width: 100%; background: #c62828; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    </style>
-</head>
-<body>
+<div class="panel-container" id="user-page">
+    <h2 class="title">KEY GEN</h2>
+    
+    <label>Games</label>
+    <select id="game-select">
+        <option value="pubg">PUBG MOBILE</option>
+        <option value="pubg-lite">PUBG MOBILE LITE</option>
+    </select>
 
-<div id="login-page">
-    <div class="login-box">
-        <h2 style="color:#c62828">ADMIN LOGIN</h2>
-        <input type="text" id="user" placeholder="Username">
-        <input type="password" id="pass" placeholder="Password">
-        <button class="login-btn" onclick="login()">LOGIN</button>
-        <p id="err" style="color:red; font-size:12px; margin-top:10px;"></p>
+    <label>Duration Of Key</label>
+    <select id="duration-select" onchange="updatePrice()">
+        <option value="0" data-price="0">2 Hour - Free</option>
+        <option value="0" data-price="0">5 Hour - Free</option>
+        <option value="3" data-price="3">1 Day - $3</option>
+        <option value="12" data-price="12">1 Week - $12</option>
+        <option value="25" data-price="25">1 Month - $25</option>
+    </select>
+
+    <label>Max Devices (Kaç Cihaz Kullansın?)</label>
+    <input type="number" id="max-devices" value="1" min="1" placeholder="Örn: 10">
+
+    <label>Enter Bulk Key Number (Kaç Adet Key Üretilsin?)</label>
+    <input type="number" id="bulk-number" value="1" min="1">
+
+    <div class="total-section">
+        TOTAL PRICE: $<span id="total-price">0</span>
     </div>
+
+    <button class="btn-generate" onclick="generateKey()">GENERATE KEY</button>
+    
+    <div id="key-output" class="waiting-box">WAITING...</div>
+    
+    <button class="btn-nav" onclick="switchPage('admin-page')">Admin/Özel Panele Geç →</button>
 </div>
 
-<div class="header">CREATE LICENSE</div>
-<div class="container">
-    <div class="section-title">Games</div>
-    <select>
-        <option>PUBG Mobile</option>
-        <option>BGMI</option>
-    </select>
+<div class="panel-container" id="admin-page" style="display:none; border-color: #4CAF50;">
+    <h2 class="title" style="color: #4CAF50;">ADMIN PANEL</h2>
 
-    <div class="section-title">Duration Of Key</div>
-    <select id="duration" onchange="updatePrice()">
-        <option value="80">5 Hour — ₹80/Device</option>
-        <option value="150">24 Hour — ₹150/Device</option>
-        <option value="500">1 Week — ₹500/Device</option>
-        <option value="1200">1 Month — ₹1200/Device</option>
-    </select>
+    <label>Özel Key İsmi Yaz</label>
+    <input type="text" id="custom-key-name" placeholder="Örn: KRAL-PUBG-99">
 
-    <div class="section-title">Max Devices</div>
-    <input type="number" value="1" readonly>
-
-    <div class="section-title">ENTER BULK KEY NUMBER</div>
-    <input type="number" value="1" readonly>
-
-    <div class="section-title">TOTAL PRICES</div>
-    <div class="price-box">
-        <span class="price-label">₹</span>
-        <span id="total-price">80</span>
+    <label>Süre Belirle</label>
+    <div style="display: flex; gap: 5px;">
+        <input type="number" id="custom-time-val" placeholder="Sayı" style="flex: 2;">
+        <select id="custom-time-unit" style="flex: 1;">
+            <option value="Saat">Saat</option>
+            <option value="Gün">Gün</option>
+        </select>
     </div>
 
-    <button class="gen-button" onclick="generate()">GENERATE KEY</button>
-    <div id="key-output"></div>
+    <label>Cihaz Sınırı</label>
+    <input type="number" id="admin-device-limit" value="1">
+
+    <button class="btn-generate" style="background: #4CAF50;" onclick="createAdminKey()">ÖZEL KEY OLUŞTUR</button>
+
+    <div style="margin-top:20px; border-top: 1px solid #333; padding-top:10px;">
+        <h3 style="font-size: 14px;">Aktif Key Listesi</h3>
+        <div id="admin-key-list">
+            </div>
+    </div>
+
+    <button class="btn-nav" onclick="switchPage('user-page')">← Satın Alma Sayfasına Dön</button>
 </div>
 
 <script>
-    function login() {
-        const u = document.getElementById('user').value;
-        const p = document.getElementById('pass').value;
-        if(u === "Admin97" && p === "Admin1997") {
-            document.getElementById('login-page').style.display = 'none';
-        } else {
-            document.getElementById('err').innerText = "WRONG LOGIN OR PASSWORD!";
-        }
-    }
-
+    // Fiyatı sadece süreye göre günceller (Cihaz sayısı çarpılmaz)
     function updatePrice() {
-        const p = document.getElementById('duration').value;
-        document.getElementById('total-price').innerText = p;
+        const durationSelect = document.getElementById('duration-select');
+        const price = durationSelect.options[durationSelect.selectedIndex].getAttribute('data-price');
+        document.getElementById('total-price').innerText = price;
     }
 
-    function generate() {
-        const key = "ADM97-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-        const out = document.getElementById('key-output');
-        out.innerText = "YOUR KEY: " + key;
-        out.style.display = 'block';
+    // Sayfalar arası geçiş
+    function switchPage(pageId) {
+        document.getElementById('user-page').style.display = pageId === 'user-page' ? 'block' : 'none';
+        document.getElementById('admin-page').style.display = pageId === 'admin-page' ? 'block' : 'none';
+    }
+
+    // Admin Key Oluşturma ve Aktif/Deaktif Fonksiyonu
+    function createAdminKey() {
+        const name = document.getElementById('custom-key-name').value;
+        const time = document.getElementById('custom-time-val').value;
+        const unit = document.getElementById('custom-time-unit').value;
+        const devices = document.getElementById('admin-device-limit').value;
+
+        if(!name || !time) { alert("Lütfen bilgileri doldurun!"); return; }
+
+        const keyDiv = document.createElement('div');
+        keyDiv.className = 'key-item';
+        keyDiv.style = "display:flex; justify-content:space-between; align-items:center; background:#222; padding:5px; margin-bottom:5px; border-radius:4px; font-size:12px;";
+        keyDiv.innerHTML = `
+            <span>${name} (${time} ${unit}) - [${devices} Cihaz]</span>
+            <button onclick="this.parentElement.remove()" style="background:red; color:white; border:none; border-radius:3px; cursor:pointer;">Deaktif Et</button>
+        `;
+        document.getElementById('admin-key-list').appendChild(keyDiv);
     }
 </script>
-</body>
-</html>
+
+<style>
+    body { background-color: #0d0d0d; color: #ff9800; font-family: sans-serif; }
+    .panel-container { 
+        width: 340px; margin: 30px auto; padding: 20px; 
+        border: 2px solid #ff9800; border-radius: 20px; background: #1a1a1a;
+    }
+    .title { text-align: center; font-size: 24px; margin-bottom: 20px; }
+    label { display: block; margin-top: 12px; font-size: 13px; color: #aaa; }
+    select, input { 
+        width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box;
+        background: #2b2b2b; border: 1px solid #444; color: #fff; border-radius: 10px;
+    }
+    .total-section { 
+        background: #ff9800; color: #000; padding: 15px; 
+        margin-top: 20px; text-align: center; font-weight: bold; border-radius: 12px; font-size: 18px;
+    }
+    .btn-generate { 
+        width: 100%; padding: 15px; margin-top: 15px; 
+        background: #ff9800; border: none; border-radius: 12px; 
+        font-weight: bold; cursor: pointer; color: #000;
+    }
+    .waiting-box { 
+        margin-top: 15px; padding: 10px; border: 1px dashed #ff9800; 
+        text-align: center; color: #00ff00; border-radius: 10px;
+    }
+    .btn-nav { 
+        background: none; border: none; color: #777; width: 100%; 
+        margin-top: 20px; cursor: pointer; text-decoration: underline; 
+    }
+</style>
